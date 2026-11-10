@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estúdio de Criação Musical IA</title>
+  <style>
+    :root {
+      --bg: #0f111a;
+      --card-bg: #1a1d2e;
+      --accent: #7c3aed;
+      --accent-hover: #6d28d9;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #2e344d;
+      --input-bg: #131622;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 1.5rem; }
+    header { text-align: center; margin-bottom: 0.5rem; }
+    header h1 { font-size: 2.2rem; margin-bottom: 0.4rem; background: linear-gradient(135deg, #a78bfa, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { color: var(--text-muted); font-size: 1rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .card-title { font-size: 1.2rem; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #c4b5fd; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
+    label { font-size: 0.9rem; font-weight: 500; color: #e5e7eb; }
+    input[type="text"], select, textarea {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { min-height: 220px; font-family: 'Consolas', monospace; line-height: 1.5; resize: vertical; }
+    .genre-presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .preset-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 20px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .tag-helpers { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+    .tag-btn {
+      background: #252a3d;
+      border: 1px solid #3b4263;
+      color: #a78bfa;
+      border-radius: 6px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: monospace;
+      font-weight: 600;
+    }
+    .tag-btn:hover { background: #3b4263; color: #fff; }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+    }
+    .btn-submit:hover { opacity: 0.95; }
+    .btn-submit:active { transform: scale(0.99); }
+    .status-box {
+      display: none;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.95rem;
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
+    .status-box.info { background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; color: #93c5fd; }
+    .status-box.success { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #a7f3d0; }
+    .status-box.warning { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fde68a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 Estúdio de Criação Musical IA</h1>
+      <p>Crie músicas completas com instrumentos, vocais e letras originais</p>
+    </header>
+
+    <div class="card">
+      <div class="card-title">1. Informações Básicas</div>
+      <div class="form-group">
+        <label for="titulo">Título da Música</label>
+        <input type="text" id="titulo" placeholder="Ex: Estrada Sem Fim" value="Nossa História">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2. Gênero Musical & Instrumentação</div>
+      <label>Escolha rápida de estilo:</label>
+      <div class="genre-presets" id="presetContainer">
+        <button type="button" class="preset-btn active" data-tags="brazilian pop rock, electric guitar riffs, punchy drums, driving bass, passionate male vocals, 125 bpm">Pop Rock BR</button>
+        <button type="button" class="preset-btn" data-tags="bossa nova, smooth nylon acoustic guitar, soft percussion, warm upright bass, gentle female vocals, intimate vibe">Bossa Nova</button>
+        <button type="button" class="preset-btn" data-tags="brazilian sertanejo, acoustic steel guitar, accordion solo, modern pop drums, expressive male vocals, emotional">Sertanejo</button>
+        <button type="button" class="preset-btn" data-tags="synthwave, 1980s analog synthesizers, gated reverb snare, driving arpeggiator, nostalgic atmospheric vocals, 115 bpm">Synthwave 80s</button>
+        <button type="button" class="preset-btn" data-tags="indie folk pop, acoustic guitar fingerpicking, handclaps, warm vocal harmonies, uplifting chorus, 100 bpm">Indie Pop Acústico</button>
+        <button type="button" class="preset-btn" data-tags="melodic heavy metal, fast double bass drums, heavy distorted guitars, epic melodic guitar solo, powerful soaring vocals">Heavy Metal</button>
+        <button type="button" class="preset-btn" data-tags="melodic lo-fi hip hop, chill Rhodes piano, soft 808 sub bass, relaxed drum groove, smooth vocal flow, 85 bpm">Lo-Fi Trap</button>
+      </div>
+
+      <div class="form-group">
+        <label for="tags">Tags de Estilo, Instrumentos e Voz (em inglês para melhor precisão do modelo)</label>
+        <input type="text" id="tags" value="brazilian pop rock, electric guitar riffs, punchy drums, driving bass, passionate male vocals, 125 bpm">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">3. Letra e Arranjo da Música</div>
+      <label>Clique nas tags para inserir blocos de arranjo na letra:</label>
+      <div class="tag-helpers">
+        <button type="button" class="tag-btn" onclick="inserirTag('[Verse 1]\n')">+ [Verse 1]</button>
+        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Chorus]\n')">+ [Chorus]</button>
+        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Verse 2]\n')">+ [Verse 2]</button>
+        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Bridge]\n')">+ [Bridge]</button>
+        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Guitar Solo]\n')">+ [Guitar Solo]</button>
+        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Drop]\n')">+ [Drop]</button>
+        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Outro]\n')">+ [Outro]</button>
+      </div>
+
+      <div class="form-group">
+        <textarea id="letra">[Verse 1]
+Foram dias conversando através de um visor
+A distância era grande, mas não parou esse amor
+Até que o grande dia finalmente chegou
+Nenhum quilômetro a mais nos separou
+
+[Verse 2]
+Para poder te ver, uma desculpa eu encontrei
+Suas sobrinhas chegaram de viagem, me animei
+Peguei a estrada e fui direto te encontrar
+O coração batendo forte, pronto pra desabar
+
+[Pre-Chorus]
+E ficamos ali, por horas a conversar
+Eu perdido no tempo, perdido no teu olhar
+As palavras fluíam, mas no fundo do meu ser
+Eu só pensava em um jeito de não te perder
+
+[Chorus]
+Nossa história, tão perto de decolar
+O relógio girando e eu querendo ficar
+O tempo estava acabando, a hora de ir chegou
+E o "eu te amo" na minha garganta... sufocou
+
+[Verse 3]
+Eu tentava me expressar, queria tanto dizer
+Que a minha maior vontade era ficar com você
+Mas a hora foi passando, a despedida doeu
+Ficou o silêncio entre você e eu
+
+[Chorus]
+Nossa história, tão perto de decolar
+O relógio girando e eu querendo ficar
+O tempo estava acabando, a hora de ir chegou
+E o "eu te amo" na minha garganta... sufocou
+
+[Bridge]
+Mas a distância não apaga o que a gente viveu
+O seu olhar ficou guardado junto ao meu
+O que eu não disse naquele momento, eu guardei aqui
+Escrevo essa canção só pra te fazer sorrir
+
+[Outro]
+Ainda guardo esse amor, aqui dentro de mim
+Nossa história, meu bem, não vai terminar assim
+Eu não consegui dizer...
+Mas eu te amo.
+[Fade out]</textarea>
+      </div>
+
+      <button type="button" class="btn-submit" id="btnGerar" onclick="dispararGeracao()">✨ Gerar Música Completa</button>
+      <div id="statusBox" class="status-box"></div>
+    </div>
+  </div>
+
+  <script>
+    // Presets de Gênero
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tags').value = btn.dataset.tags;
+      });
+    });
+
+    function inserirTag(tag) {
+      const textarea = document.getElementById('letra');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      textarea.value = textarea.value.substring(0, start) + tag + textarea.value.substring(end);
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + tag.length;
+    }
+
+    async function dispararGeracao() {
+      const titulo = document.getElementById('titulo').value.trim();
+      const tags = document.getElementById('tags').value.trim();
+      const letra = document.getElementById('letra').value.trim();
+      const btn = document.getElementById('btnGerar');
+      const box = document.getElementById('statusBox');
+
+      btn.disabled = true;
+      btn.innerText = "⏳ Processando...";
+      box.style.display = "block";
+      box.className = "status-box info";
+      box.innerText = "Enviando composição para processamento...";
+
+      try {
+        const resp = await fetch('/api/gerar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titulo, tags, letra })
+        });
+        const data = await resp.json();
+
+        if (data.modo === "rascunho") {
+          box.className = "status-box warning";
+          box.innerHTML = `<strong>⚠️ Modo Rascunho:</strong> ${data.mensagem}<br>Arquivo salvo: <code>outputs/${data.arquivo_salvo}</code>`;
+        } else if (data.sucesso) {
+          box.className = "status-box info";
+          
+          // Extrai o ID da tarefa retornado pela API
+          let taskId = null;
+          const res = data.resultado;
+          if (res) {
+            taskId = res.taskId || res.task_id || res.id || (res.data && (res.data.taskId || res.data.task_id || res.data.id));
+          }
+
+          box.innerHTML = `<strong>🎉 Sucesso!</strong> A música foi enviada para o estúdio da IA.<br>` +
+                          `ID da Tarefa: <code>${taskId || JSON.stringify(res)}</code><br><br>` +
+                          `<div id="pollingStatus">⏳ Sintetizando arranjos e vocais... Isso leva cerca de 1 minuto. Aguarde...</div>`;
+
+          if (taskId) {
+            iniciarMonitoramento(taskId);
+          }
+        } else {
+          box.className = "status-box warning";
+          box.innerText = data.erro || "Ocorreu um problema ao gerar.";
+        }
+      } catch (e) {
+        box.className = "status-box warning";
+        box.innerText = "Erro ao conectar com o servidor: " + e.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "✨ Gerar Música Completa";
+      }
+    }
+
+    async function iniciarMonitoramento(taskId) {
+      const pStatus = document.getElementById('pollingStatus');
+      const box = document.getElementById('statusBox');
+      let tentativas = 0;
+      const maxTentativas = 30;
+
+      const intervalo = setInterval(async () => {
+        tentativas++;
+        pStatus.innerText = `⏳ Gerando áudio... Tentativa ${tentativas}/${maxTentativas} (aguarde alguns segundos)`;
+
+        try {
+          const resp = await fetch(`/api/status-task?taskId=${encodeURIComponent(taskId)}`);
+          const data = await resp.json();
+
+          let audioUrl = null;
+          let sunoData = null;
+
+          if (data && data.data && data.data.response && data.data.response.sunoData) {
+            sunoData = data.data.response.sunoData;
+          } else if (data && data.response && data.response.sunoData) {
+            sunoData = data.response.sunoData;
+          } else if (Array.isArray(data) && data.length > 0) {
+            sunoData = data;
+          }
+
+          if (sunoData && sunoData.length > 0) {
+            audioUrl = sunoData[0].audio_url || sunoData[0].stream_audio_url;
+          }
+
+          if (audioUrl) {
+            clearInterval(intervalo);
+            box.className = "status-box success";
+            box.innerHTML = `
+              <h3>🎵 Sua música "Nossa História" está pronta!</h3>
+              <p style="margin: 0.8rem 0;">Aperte o play para ouvir a versão gerada pela IA:</p>
+              <audio controls autoplay style="width: 100%; margin: 0.5rem 0;">
+                <source src="${audioUrl}" type="audio/mpeg">
+                Seu navegador não suporta áudio.
+              </audio>
+              <div style="margin-top: 1rem;">
+                <a href="${audioUrl}" target="_blank" download="Nossa_Historia.mp3" style="display: inline-block; background: #10b981; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600;">⬇️ Baixar Arquivo MP3</a>
+              </div>
+            `;
+            return;
+          }
+
+          if (tentativas >= maxTentativas) {
+            clearInterval(intervalo);
+            pStatus.innerHTML = `O processamento ainda está em andamento. Você também pode conferir e ouvir a faixa diretamente no painel do <a href="https://aimusicapi.ai/dashboard" target="_blank" style="color: #a78bfa;">AIMusicAPI Dashboard</a>.`;
+          }
+        } catch (err) {
+          console.error("Erro ao verificar status:", err);
+        }
+      }, 10000); // Checa a cada 10 segundos
+    }
+  </script>
+</body>
+</html>
+

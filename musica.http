@@ -1,0 +1,30 @@
+###
+# REQUISIÇÕES DE TESTE - AIMUSICAPI.AI (ROTA DIRETA SONIC)
+# Música: Nossa História
+###
+
+@baseUrl = https://api.aimusicapi.ai
+@apiKey = sk_340632903dc9415783b70acabd3e4588
+
+### 1. Criar música: "Nossa História"
+# Clique em "Send Request" logo abaixo:
+POST {{baseUrl}}/api/v1/sonic/create
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+
+{
+  "prompt": "[Verse 1]\nForam dias conversando através de um visor\nA distância era grande, mas não parou esse amor\nAté que o grande dia finalmente chegou\nNenhum quilômetro a mais nos separou\n\n[Verse 2]\nPara poder te ver, uma desculpa eu encontrei\nSuas sobrinhas chegaram de viagem, me animei\nPeguei a estrada e fui direto te encontrar\nO coração batendo forte, pronto pra desabar\n\n[Pre-Chorus]\nE ficamos ali, por horas a conversar\nEu perdido no tempo, perdido no teu olhar\nAs palavras fluíam, mas no fundo do meu ser\nEu só pensava em um jeito de não te perder\n\n[Chorus]\nNossa história, tão perto de decolar\nO relógio girando e eu querendo ficar\nO tempo estava acabando, a hora de ir chegou\nE o \"eu te amo\" na minha garganta... sufocou\n\n[Verse 3]\nEu tentava me expressar, queria tanto dizer\nQue a minha maior vontade era ficar com você\nMas a hora foi passando, a despedida doeu\nFicou o silêncio entre você e eu\n\n[Chorus]\nNossa história, tão perto de decolar\nO relógio girando e eu querendo ficar\nO tempo estava acabando, a hora de ir chegou\nE o \"eu te amo\" na minha garganta... sufocou\n\n[Bridge]\nMas a distância não apaga o que a gente viveu\nO seu olhar ficou guardado junto ao meu\nO que eu não disse naquele momento, eu guardei aqui\nEscrevo essa canção só pra te fazer sorrir\n\n[Outro]\nAinda guardo esse amor, aqui dentro de mim\nNossa história, meu bem, não vai terminar assim\nEu não consegui dizer...\nMas eu te amo.\n[Fade out]",
+  "tags": "brazilian romantic sertanejo, acoustic steel guitar, soft accordion solo, emotional expressive male vocals, poignant ballad, 88 bpm",
+  "title": "Nossa História",
+  "custom_mode": true,
+  "make_instrumental": false
+}
+
+### 2. Consultar o status da música gerada
+# Substitua o ID abaixo pelo "task_id" que vier na resposta acima:
+@taskId = COLE_O_TASK_ID_AQUI
+
+GET {{baseUrl}}/api/v1/sonic/task/{{taskId}}
+Authorization: Bearer {{apiKey}}
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)

@@ -1,0 +1,18 @@
+# Ambiente virtual
+.venv/
+env/
+venv/
+
+# Chaves de API e variáveis de ambiente (NUNCA SUBIR)
+.env
+.env.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos de teste temporários
+test_api.py
+buscar_audio.py
+baixar_stems.py

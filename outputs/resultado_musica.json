@@ -1,0 +1,40 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "clip_id": "e7cf2730-e8bf-4975-a5bc-0bd934bec62e",
+      "state": "succeeded",
+      "title": "Nossa História",
+      "tags": "brazilian pop rock, passionate male vocals in a low, dark lower register, gritty and strained, with a fuller chorus; analog tape saturation warming the vocals and guitars; driving 125 bpm pulse, electric guitar riffs, punchy drums, driving bass.",
+      "lyrics": "[Verse 1]\nForam dias conversando através de um visor\nA distância era grande, mas não parou esse amor\nAté que o grande dia finalmente chegou\nNenhum quilômetro a mais nos separou\n\n[Verse 2]\nPara poder te ver, uma desculpa eu encontrei\nSuas sobrinhas chegaram de viagem, me animei\nPeguei a estrada e fui direto te encontrar\nO coração batendo forte, pronto pra desabar\n\n[Pre-Chorus]\nE ficamos ali, por horas a conversar\nEu perdido no tempo, perdido no teu olhar\nAs palavras fluíam, mas no fundo do meu ser\nEu só pensava em um jeito de não te perder\n\n[Chorus]\nNossa história, tão perto de decolar\nO relógio girando e eu querendo ficar\nO tempo estava acabando, a hora de ir chegou\nE o \"eu te amo\" na minha garganta... sufocou\n\n[Verse 3]\nEu tentava me expressar, queria tanto dizer\nQue a minha maior vontade era ficar com você\nMas a hora foi passando, a despedida doeu\nFicou o silêncio entre você e eu\n\n[Chorus]\nNossa história, tão perto de decolar\nO relógio girando e eu querendo ficar\nO tempo estava acabando, a hora de ir chegou\nE o \"eu te amo\" na minha garganta... sufocou\n\n[Bridge]\nMas a distância não apaga o que a gente viveu\nO seu olhar ficou guardado junto ao meu\nO que eu não disse naquele momento, eu guardei aqui\nEscrevo essa canção só pra te fazer sorrir\n\n[Outro]\nAinda guardo esse amor, aqui dentro de mim\nNossa história, meu bem, não vai terminar assim\nEu não consegui dizer...\nMas eu te amo.\n[Fade out]",
+      "image_url": "https://files.aimusicapi.ai/stems/e7cf2730-e8bf-4975-a5bc-0bd934bec62e-img.jpeg",
+      "audio_url": "https://files.aimusicapi.ai/stems/e7cf2730-e8bf-4975-a5bc-0bd934bec62e.mp3",
+      "video_url": null,
+      "created_at": "2026-11-10T19:57:32.756Z",
+      "gpt_description_prompt": null,
+      "duration": "236.8",
+      "negative_tags": null,
+      "style_weight": null,
+      "weirdness_constraint": null,
+      "mv": "chirp-v3-5"
+    },
+    {
+      "clip_id": "416be0b5-5d55-4668-9324-3e0bfeca95bd",
+      "state": "succeeded",
+      "title": "Nossa História",
+      "tags": "brazilian pop rock, gated snare reverb on crisp backbeats; driving 125 bpm pulse, electric guitar riffs, punchy drums, driving bass; passionate male vocals in Portuguese, wide range climbing into top notes, bright and clear-toned; full-band chorus lift.",
+      "lyrics": "[Verse 1]\nForam dias conversando através de um visor\nA distância era grande, mas não parou esse amor\nAté que o grande dia finalmente chegou\nNenhum quilômetro a mais nos separou\n\n[Verse 2]\nPara poder te ver, uma desculpa eu encontrei\nSuas sobrinhas chegaram de viagem, me animei\nPeguei a estrada e fui direto te encontrar\nO coração batendo forte, pronto pra desabar\n\n[Pre-Chorus]\nE ficamos ali, por horas a conversar\nEu perdido no tempo, perdido no teu olhar\nAs palavras fluíam, mas no fundo do meu ser\nEu só pensava em um jeito de não te perder\n\n[Chorus]\nNossa história, tão perto de decolar\nO relógio girando e eu querendo ficar\nO tempo estava acabando, a hora de ir chegou\nE o \"eu te amo\" na minha garganta... sufocou\n\n[Verse 3]\nEu tentava me expressar, queria tanto dizer\nQue a minha maior vontade era ficar com você\nMas a hora foi passando, a despedida doeu\nFicou o silêncio entre você e eu\n\n[Chorus]\nNossa história, tão perto de decolar\nO relógio girando e eu querendo ficar\nO tempo estava acabando, a hora de ir chegou\nE o \"eu te amo\" na minha garganta... sufocou\n\n[Bridge]\nMas a distância não apaga o que a gente viveu\nO seu olhar ficou guardado junto ao meu\nO que eu não disse naquele momento, eu guardei aqui\nEscrevo essa canção só pra te fazer sorrir\n\n[Outro]\nAinda guardo esse amor, aqui dentro de mim\nNossa história, meu bem, não vai terminar assim\nEu não consegui dizer...\nMas eu te amo.\n[Fade out]",
+      "image_url": "https://files.aimusicapi.ai/stems/416be0b5-5d55-4668-9324-3e0bfeca95bd-img.jpeg",
+      "audio_url": "https://files.aimusicapi.ai/stems/416be0b5-5d55-4668-9324-3e0bfeca95bd.mp3",
+      "video_url": null,
+      "created_at": "2026-11-10T19:57:32.756Z",
+      "gpt_description_prompt": null,
+      "duration": "247.96",
+      "negative_tags": null,
+      "style_weight": null,
+      "weirdness_constraint": null,
+      "mv": "chirp-v3-5"
+    }
+  ],
+  "message": "success"
+}
