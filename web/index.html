@@ -187,6 +187,8 @@
             <label for="motor">Escolha a API / Motor de IA:</label>
             <select id="motor" onchange="atualizarDicaMotor()">
               <option value="aimusicapi">Suno AI (via AIMusicAPI.ai)</option>
+              <option value="google_lyria_pro">Google Lyria 3.5 / 3 Pro (Música Completa - Gemini API)</option>
+              <option value="google_lyria_clip">Google Lyria 3 Clip (Prévia Rápida 30s - Gemini API)</option>
               <option value="fal_minimax">MiniMax Music v2.6 (via Fal.ai)</option>
               <option value="fal_acestep">ACE-Step Open-Source (via Fal.ai)</option>
             </select>
@@ -334,6 +336,8 @@ Mas eu te amo.
       const hint = document.getElementById('motorHint');
       if (motor === 'aimusicapi') {
         hint.innerText = '✅ Se deixar vazio no modo Suno (AIMusicAPI), o sistema usará a chave configurada no seu arquivo .env.';
+      } else if (motor.startsWith('google_lyria')) {
+        hint.innerText = '🌟 Cole sua API Key do Google AI Studio (aistudio.google.com) acima ou configure GEMINI_API_KEY no .env.';
       } else {
         hint.innerText = '🔑 Cole sua API Key da Fal.ai (fal.ai/dashboard/keys) acima para rodar este motor.';
       }
@@ -460,6 +464,16 @@ Mas eu te amo.
         if (data.modo === "rascunho") {
           box.className = "status-box warning";
           box.innerHTML = `<strong>⚠️ Modo Rascunho:</strong> ${data.mensagem}<br>Arquivo: <code>outputs/${data.arquivo_salvo}</code>`;
+        } else if (data.sucesso && data.audio_url_direto) {
+          box.className = "status-box success";
+          box.innerHTML = `
+            <h3>🎵 "${titulo}" gerada com ${data.motor}!</h3>
+            <audio controls autoplay style="width: 100%; margin: 0.7rem 0;">
+              <source src="${data.audio_url_direto}" type="audio/mpeg">
+            </audio>
+            <a href="${data.audio_url_direto}" target="_blank" download="${data.arquivo_nome || 'musica.mp3'}" style="display: inline-block; background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">⬇️ Baixar Arquivo</a>
+          `;
+          carregarBiblioteca();
         } else if (data.sucesso) {
           box.className = "status-box info";
           const res = data.resultado || {};

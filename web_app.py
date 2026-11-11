@@ -1,12 +1,14 @@
 """
 Servidor Web Local do Estúdio de Criação Musical Multi-Motor
-Suporta: Suno (AIMusicAPI), MiniMax Music (Fal.ai) e ACE-Step 1.5 (Fal.ai).
+Suporta: Suno (AIMusicAPI), Google Lyria 3 / 3.5 (Gemini API), MiniMax Music (Fal.ai) e ACE-Step 1.5 (Fal.ai).
 Inclui Biblioteca de Músicas Geradas + Prompts Utilizados.
 """
 
 import os
 import ssl
+import time
 import json
+import base64
 import urllib.request
 import urllib.error
 from urllib.parse import urlparse, parse_qs
@@ -59,23 +61,33 @@ def obter_biblioteca_musicas():
         except Exception:
             pass
 
-    # Mapeia os MP3s locais da pasta outputs/
-    mp3s = sorted(OUTPUT_DIR.glob("*.mp3"))
-    for idx, mp3 in enumerate(mp3s):
-        nome_base = mp3.stem
+    # Mapeia os MP3s e WAVs locais da pasta outputs/
+    arquivos_audio = sorted(list(OUTPUT_DIR.glob("*.mp3")) + list(OUTPUT_DIR.glob("*.wav")), key=lambda p: p.stat().st_mtime, reverse=True)
+    for idx, audio_arq in enumerate(arquivos_audio):
+        nome_base = audio_arq.stem
         capa_local = OUTPUT_DIR / f"{nome_base}_Capa.jpeg"
         if not capa_local.exists():
             capa_local = None
 
-        meta = dados_suno[idx] if idx < len(dados_suno) else {}
+        meta_json = OUTPUT_DIR / f"{nome_base}.json"
+        if meta_json.exists():
+            try:
+                with open(meta_json, "r", encoding="utf-8") as mf:
+                    meta = json.load(mf)
+            except Exception:
+                meta = {}
+        else:
+            # Tenta vincular ao resultado_musica.json (Suno)
+            meta = next((d for d in dados_suno if d.get("title", "").lower() in nome_base.lower() or nome_base.endswith("_1") and dados_suno.index(d) == 0 or nome_base.endswith("_2") and dados_suno.index(d) == 1), {})
+
         musicas_geradas.append({
             "id": meta.get("clip_id", nome_base),
             "titulo": meta.get("title", nome_base.replace("_", " ")),
-            "arquivo": f"/outputs/{mp3.name}",
+            "arquivo": f"/outputs/{audio_arq.name}",
             "capa": f"/outputs/{capa_local.name}" if capa_local else meta.get("image_url"),
             "tags": meta.get("tags", "brazilian pop rock, electric guitar, passionate male vocals, 125 bpm"),
             "letra": meta.get("lyrics", ""),
-            "motor": f"Suno ({meta.get('mv', 'chirp-v3-5')})" if meta else "Local MP3",
+            "motor": meta.get("motor") or (f"Suno ({meta.get('mv', 'chirp-v3-5')})" if meta.get("mv") else "Local Audio"),
             "duracao": meta.get("duration", ""),
         })
 
@@ -195,6 +207,114 @@ class MusicHandler(SimpleHTTPRequestHandler):
             token_ui = dados.get("token", "").strip()
 
             ssl_ctx = criar_contexto_ssl()
+
+            # --- MOTOR GOOGLE LYRIA (Gemini API) ---
+            if motor in ("google_lyria_pro", "google_lyria_clip"):
+                google_key = token_ui or os.getenv("GEMINI_API_KEY", "").strip()
+                if not google_key or google_key == "sua_chave_gemini_aqui":
+                    self._responder_json({"sucesso": False, "erro": "Informe sua Gemini API Key (Google AI Studio) no campo Token acima ou no .env (GEMINI_API_KEY)."})
+                    return
+
+                modelos_tentativa = (
+                    ["lyria-3.5", "lyria-3-pro-preview"]
+                    if motor == "google_lyria_pro"
+                    else ["lyria-3-clip-preview"]
+                )
+
+                prompt_completo = (
+                    f"Title: {titulo}\n"
+                    f"Musical Style & Instrumentation: {tags}\n\n"
+                    f"Create a high-fidelity complete song singing the exact lyrics below with matching vocals, rhythm, and arrangement:\n\n"
+                    f"{letra}"
+                )
+
+                payload_google = {
+                    "contents": [
+                        {
+                            "role": "user",
+                            "parts": [{"text": prompt_completo}],
+                        }
+                    ]
+                }
+
+                headers_google = {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": google_key,
+                }
+
+                ultimo_erro_g = None
+                resp_google = None
+                modelo_usado = None
+
+                for mod in modelos_tentativa:
+                    try:
+                        url_g = f"https://generativelanguage.googleapis.com/v1beta/models/{mod}:generateContent"
+                        req_g = urllib.request.Request(
+                            url_g,
+                            data=json.dumps(payload_google).encode("utf-8"),
+                            headers=headers_google,
+                            method="POST",
+                        )
+                        with urllib.request.urlopen(req_g, timeout=180, context=ssl_ctx) as resp:
+                            resp_google = json.loads(resp.read().decode("utf-8"))
+                            modelo_usado = mod
+                            break
+                    except urllib.error.HTTPError as he:
+                        ultimo_erro_g = f"Google Erro {he.code} ({mod}): {he.read().decode('utf-8', errors='ignore')}"
+                    except Exception as ex:
+                        ultimo_erro_g = str(ex)
+
+                if not resp_google:
+                    self._responder_json({"sucesso": False, "erro": ultimo_erro_g or "Erro ao chamar Google Lyria API."})
+                    return
+
+                # Extrai áudio base64 de inlineData
+                audio_b64 = None
+                mime_type = "audio/mp3"
+                texto_retorno = ""
+                try:
+                    parts = resp_google.get("candidates", [{}])[0].get("content", {}).get("parts", [])
+                    for p in parts:
+                        if "inlineData" in p:
+                            audio_b64 = p["inlineData"].get("data")
+                            mime_type = p["inlineData"].get("mimeType", "audio/mp3")
+                        elif "text" in p:
+                            texto_retorno += p["text"]
+                except Exception as ex_parse:
+                    self._responder_json({"sucesso": False, "erro": f"Erro ao ler resposta do Lyria: {ex_parse}", "raw": resp_google})
+                    return
+
+                if not audio_b64:
+                    self._responder_json({"sucesso": False, "erro": f"O modelo {modelo_usado} não retornou áudio. Resposta: {texto_retorno or json.dumps(resp_google)}"})
+                    return
+
+                ext = "wav" if "wav" in mime_type.lower() else "mp3"
+                nome_limpo = "".join(c for c in titulo if c.isalnum() or c in (" ", "_")).rstrip().replace(" ", "_") or "Musica_Lyria"
+                timestamp = int(time.time())
+                nome_arquivo = f"{nome_limpo}_Lyria_{timestamp}.{ext}"
+                caminho_audio = OUTPUT_DIR / nome_arquivo
+
+                with open(caminho_audio, "wb") as fa:
+                    fa.write(base64.b64decode(audio_b64))
+
+                # Salva metadados para a biblioteca
+                caminho_meta = OUTPUT_DIR / f"{nome_limpo}_Lyria_{timestamp}.json"
+                with open(caminho_meta, "w", encoding="utf-8") as fm:
+                    json.dump({
+                        "title": titulo,
+                        "tags": tags,
+                        "lyrics": letra,
+                        "motor": f"Google ({modelo_usado})",
+                        "arquivo": f"/outputs/{nome_arquivo}",
+                    }, fm, ensure_ascii=False, indent=2)
+
+                self._responder_json({
+                    "sucesso": True,
+                    "motor": f"Google ({modelo_usado})",
+                    "audio_url_direto": f"/outputs/{nome_arquivo}",
+                    "arquivo_nome": nome_arquivo,
+                })
+                return
 
             # --- MOTOR 1: FAL.AI (MiniMax Music v2.6) ---
             if motor == "fal_minimax":

@@ -10,7 +10,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.13"/>
-  <img src="https://img.shields.io/badge/AI_Engine-Suno_Chirp_v3.5-7C3AED?style=for-the-badge&logo=openai&logoColor=white" alt="Suno AI"/>
+  <img src="https://img.shields.io/badge/AI_Engine-Suno_%7C_Google_Lyria_%7C_MiniMax-7C3AED?style=for-the-badge" alt="Multi-Engine AI"/>
   <img src="https://img.shields.io/badge/Interface-Web_Local-10B981?style=for-the-badge&logo=html5&logoColor=white" alt="Web UI"/>
   <img src="https://img.shields.io/badge/Status-Produção_Concluída-brightgreen?style=for-the-badge" alt="Status"/>
 </p>
