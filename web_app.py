@@ -1,7 +1,7 @@
 """
-Servidor Web Local do Gerador de Músicas
-Disponibiliza uma interface visual no navegador para compor e gerar músicas.
-Funciona 100% com a biblioteca padrão do Python (sem pacotes adicionais).
+Servidor Web Local do Estúdio de Criação Musical Multi-Motor
+Suporta: Suno (AIMusicAPI), MiniMax Music (Fal.ai) e ACE-Step 1.5 (Fal.ai).
+Inclui Biblioteca de Músicas Geradas + Prompts Utilizados.
 """
 
 import os
@@ -9,8 +9,11 @@ import ssl
 import json
 import urllib.request
 import urllib.error
+from urllib.parse import urlparse, parse_qs
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
+
+from compositor import TEMPLATES_LETRAS
 
 PORT = 8080
 OUTPUT_DIR = Path("outputs")
@@ -34,11 +37,70 @@ def carregar_env():
 carregar_env()
 
 
+def criar_contexto_ssl():
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    return ctx
+
+
+def obter_biblioteca_musicas():
+    """Retorna as músicas já geradas em outputs/ com seus prompts reais e os exemplos prontos."""
+    musicas_geradas = []
+
+    # Lê metadados reais salvos em resultado_musica.json (se existir)
+    resultado_json = OUTPUT_DIR / "resultado_musica.json"
+    dados_suno = []
+    if resultado_json.exists():
+        try:
+            with open(resultado_json, "r", encoding="utf-8") as f:
+                conteudo = json.load(f)
+                dados_suno = conteudo.get("data", [])
+        except Exception:
+            pass
+
+    # Mapeia os MP3s locais da pasta outputs/
+    mp3s = sorted(OUTPUT_DIR.glob("*.mp3"))
+    for idx, mp3 in enumerate(mp3s):
+        nome_base = mp3.stem
+        capa_local = OUTPUT_DIR / f"{nome_base}_Capa.jpeg"
+        if not capa_local.exists():
+            capa_local = None
+
+        meta = dados_suno[idx] if idx < len(dados_suno) else {}
+        musicas_geradas.append({
+            "id": meta.get("clip_id", nome_base),
+            "titulo": meta.get("title", nome_base.replace("_", " ")),
+            "arquivo": f"/outputs/{mp3.name}",
+            "capa": f"/outputs/{capa_local.name}" if capa_local else meta.get("image_url"),
+            "tags": meta.get("tags", "brazilian pop rock, electric guitar, passionate male vocals, 125 bpm"),
+            "letra": meta.get("lyrics", ""),
+            "motor": f"Suno ({meta.get('mv', 'chirp-v3-5')})" if meta else "Local MP3",
+            "duracao": meta.get("duration", ""),
+        })
+
+    exemplos = []
+    for chave, tpl in TEMPLATES_LETRAS.items():
+        exemplos.append({
+            "id": chave,
+            "titulo": tpl["titulo"],
+            "tags": tpl["tags"],
+            "letra": tpl["letra"],
+        })
+
+    return {"musicas_geradas": musicas_geradas, "exemplos": exemplos}
+
+
 class MusicHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
-        # Permite carregar o frontend sem problemas de cache
         self.send_header("Access-Control-Allow-Origin", "*")
         super().end_headers()
+
+    def _responder_json(self, dados, status=200):
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(json.dumps(dados, ensure_ascii=False).encode("utf-8"))
 
     def do_GET(self):
         if self.path == "/" or self.path == "/index.html":
@@ -52,52 +114,71 @@ class MusicHandler(SimpleHTTPRequestHandler):
         elif self.path == "/api/status":
             api_key = os.getenv("AI_MUSIC_API_KEY", "").strip()
             tem_chave = bool(api_key and api_key != "sua_chave_aqui")
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps({"has_api_key": tem_chave}).encode("utf-8"))
+            self._responder_json({"has_api_key": tem_chave})
+            return
+
+        elif self.path == "/api/biblioteca":
+            self._responder_json(obter_biblioteca_musicas())
             return
 
         elif self.path.startswith("/api/status-task"):
-            from urllib.parse import urlparse, parse_qs
             query = parse_qs(urlparse(self.path).query)
             task_id = query.get("taskId", [""])[0] or query.get("id", [""])[0]
+            motor = query.get("motor", ["aimusicapi"])[0]
+            token_ui = query.get("token", [""])[0].strip()
+            status_url = query.get("statusUrl", [""])[0].strip()
+            response_url = query.get("responseUrl", [""])[0].strip()
 
-            api_key = os.getenv("AI_MUSIC_API_KEY", "").strip()
+            ssl_ctx = criar_contexto_ssl()
+
+            # Polling para Fal.ai (MiniMax / ACE-Step)
+            if motor in ("fal_minimax", "fal_acestep") and status_url:
+                headers_fal = {
+                    "Authorization": f"Key {token_ui}",
+                    "User-Agent": "Mozilla/5.0",
+                }
+                try:
+                    req = urllib.request.Request(status_url, headers=headers_fal, method="GET")
+                    with urllib.request.urlopen(req, timeout=20, context=ssl_ctx) as resp:
+                        st_data = json.loads(resp.read().decode("utf-8"))
+
+                    if st_data.get("status") == "COMPLETED" and response_url:
+                        req_res = urllib.request.Request(response_url, headers=headers_fal, method="GET")
+                        with urllib.request.urlopen(req_res, timeout=20, context=ssl_ctx) as resp_r:
+                            res_data = json.loads(resp_r.read().decode("utf-8"))
+                        audio_url = (res_data.get("audio") or {}).get("url") or (res_data.get("audio_file") or {}).get("url")
+                        self._responder_json({"status": "COMPLETED", "audio_url": audio_url, "raw": res_data})
+                        return
+
+                    self._responder_json(st_data)
+                    return
+                except Exception as e:
+                    self._responder_json({"status": "processing", "erro": str(e)})
+                    return
+
+            # Polling padrão AIMusicAPI (Suno)
+            api_key = token_ui or os.getenv("AI_MUSIC_API_KEY", "").strip()
             headers_api = {
                 "Authorization": f"Bearer {api_key}",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             }
-            ssl_ctx = ssl.create_default_context()
-            ssl_ctx.check_hostname = False
-            ssl_ctx.verify_mode = ssl.CERT_NONE
-
             rotas_check = [
-                f"https://api.musicapi.ai/api/v1/sonic/task/{task_id}",
-                f"https://api.musicapi.ai/api/v1/producer/task/{task_id}",
                 f"https://api.aimusicapi.ai/api/v1/sonic/task/{task_id}",
                 f"https://api.aimusicapi.ai/api/v1/producer/task/{task_id}",
             ]
 
-            resultado_task = None
             for r in rotas_check:
                 try:
                     req = urllib.request.Request(r, headers=headers_api, method="GET")
                     with urllib.request.urlopen(req, timeout=20, context=ssl_ctx) as resp:
                         resultado_task = json.loads(resp.read().decode("utf-8"))
-                        break
+                        self._responder_json(resultado_task)
+                        return
                 except Exception:
                     pass
 
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps(resultado_task or {"status": "processing"}).encode("utf-8"))
+            self._responder_json({"status": "processing"})
             return
-
-        elif self.path.startswith("/outputs/"):
-            # Serve arquivos de áudio gerados
-            return super().do_GET()
 
         return super().do_GET()
 
@@ -110,37 +191,95 @@ class MusicHandler(SimpleHTTPRequestHandler):
             titulo = dados.get("titulo", "Minha Música")
             tags = dados.get("tags", "acoustic pop")
             letra = dados.get("letra", "")
+            motor = dados.get("motor", "aimusicapi")
+            token_ui = dados.get("token", "").strip()
 
-            api_key = os.getenv("AI_MUSIC_API_KEY", "").strip()
-            base_url = os.getenv("API_BASE_URL", "https://api.aimusicapi.ai").rstrip("/")
+            ssl_ctx = criar_contexto_ssl()
 
-            # Se não houver chave real, salva um rascunho em outputs/
+            # --- MOTOR 1: FAL.AI (MiniMax Music v2.6) ---
+            if motor == "fal_minimax":
+                if not token_ui:
+                    self._responder_json({"sucesso": False, "erro": "Informe o seu Token da Fal.ai no campo de API Key acima."})
+                    return
+
+                headers_fal = {
+                    "Authorization": f"Key {token_ui}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0",
+                }
+                payload_fal = {
+                    "prompt": tags,
+                    "lyrics": letra,
+                }
+                try:
+                    req = urllib.request.Request(
+                        "https://queue.fal.run/fal-ai/minimax-music/v2.6",
+                        data=json.dumps(payload_fal).encode("utf-8"),
+                        headers=headers_fal,
+                        method="POST",
+                    )
+                    with urllib.request.urlopen(req, timeout=60, context=ssl_ctx) as resp:
+                        resp_data = json.loads(resp.read().decode("utf-8"))
+                    self._responder_json({"sucesso": True, "motor": motor, "resultado": resp_data})
+                except urllib.error.HTTPError as he:
+                    self._responder_json({"sucesso": False, "erro": f"Fal.ai Erro {he.code}: {he.read().decode('utf-8', errors='ignore')}"})
+                except Exception as e:
+                    self._responder_json({"sucesso": False, "erro": str(e)})
+                return
+
+            # --- MOTOR 2: FAL.AI (ACE-Step Open Source) ---
+            if motor == "fal_acestep":
+                if not token_ui:
+                    self._responder_json({"sucesso": False, "erro": "Informe o seu Token da Fal.ai no campo de API Key acima."})
+                    return
+
+                headers_fal = {
+                    "Authorization": f"Key {token_ui}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0",
+                }
+                payload_ace = {
+                    "prompt": tags,
+                    "lyrics": letra,
+                    "instrumental": False,
+                }
+                try:
+                    req = urllib.request.Request(
+                        "https://queue.fal.run/fal-ai/ace-step/prompt-to-audio",
+                        data=json.dumps(payload_ace).encode("utf-8"),
+                        headers=headers_fal,
+                        method="POST",
+                    )
+                    with urllib.request.urlopen(req, timeout=60, context=ssl_ctx) as resp:
+                        resp_data = json.loads(resp.read().decode("utf-8"))
+                    self._responder_json({"sucesso": True, "motor": motor, "resultado": resp_data})
+                except urllib.error.HTTPError as he:
+                    self._responder_json({"sucesso": False, "erro": f"Fal.ai Erro {he.code}: {he.read().decode('utf-8', errors='ignore')}"})
+                except Exception as e:
+                    self._responder_json({"sucesso": False, "erro": str(e)})
+                return
+
+            # --- MOTOR 3: AIMUSICAPI (Suno AI) ---
+            api_key = token_ui or os.getenv("AI_MUSIC_API_KEY", "").strip()
+
             if not api_key or api_key == "sua_chave_aqui":
                 nome_limpo = "".join(c for c in titulo if c.isalnum() or c in (" ", "_")).rstrip()
                 caminho_salvo = OUTPUT_DIR / f"{nome_limpo.replace(' ', '_')}_rascunho.txt"
                 with open(caminho_salvo, "w", encoding="utf-8") as f:
-                    f.write(f"TÍTULO: {titulo}\n")
-                    f.write(f"ESTILO / TAGS: {tags}\n\n")
-                    f.write("LETRA DA MÚSICA:\n")
-                    f.write(letra)
+                    f.write(f"TÍTULO: {titulo}\nESTILO / TAGS: {tags}\n\nLETRA:\n{letra}")
 
-                resposta = {
+                self._responder_json({
                     "sucesso": False,
                     "modo": "rascunho",
-                    "mensagem": "Chave de API não configurada no arquivo .env. O rascunho com o arranjo e letra foi salvo com sucesso!",
+                    "mensagem": "Chave de API não configurada. O rascunho foi salvo!",
                     "arquivo_salvo": str(caminho_salvo.name),
-                }
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps(resposta).encode("utf-8"))
+                })
                 return
 
-            # Caso haja chave configurada, dispara a chamada à API
             headers_api = {
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 "Accept": "application/json",
             }
             payload = {
@@ -153,13 +292,7 @@ class MusicHandler(SimpleHTTPRequestHandler):
             }
 
             try:
-                ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-                ssl_ctx.check_hostname = False
-                ssl_ctx.verify_mode = ssl.CERT_NONE
-
-                # Tenta primeiro a rota direta para onde o serviço redireciona
                 url_alvo = "https://api.aimusicapi.ai/api/v1/sonic/create"
-
                 req = urllib.request.Request(
                     url_alvo,
                     data=json.dumps(payload).encode("utf-8"),
@@ -169,11 +302,9 @@ class MusicHandler(SimpleHTTPRequestHandler):
                 with urllib.request.urlopen(req, timeout=60, context=ssl_ctx) as resp:
                     resp_data = json.loads(resp.read().decode("utf-8"))
 
-                # Se a resposta contiver redirect (ex: status 308)
                 if isinstance(resp_data, dict) and "redirect" in resp_data:
-                    url_redirecionada = resp_data["redirect"]
                     req_red = urllib.request.Request(
-                        url_redirecionada,
+                        resp_data["redirect"],
                         data=json.dumps(payload).encode("utf-8"),
                         headers=headers_api,
                         method="POST",
@@ -181,16 +312,11 @@ class MusicHandler(SimpleHTTPRequestHandler):
                     with urllib.request.urlopen(req_red, timeout=60, context=ssl_ctx) as resp_red:
                         resp_data = json.loads(resp_red.read().decode("utf-8"))
 
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"sucesso": True, "resultado": resp_data}).encode("utf-8"))
-
+                self._responder_json({"sucesso": True, "motor": motor, "resultado": resp_data})
+            except urllib.error.HTTPError as he:
+                self._responder_json({"sucesso": False, "erro": f"Erro {he.code}: {he.read().decode('utf-8', errors='ignore')}"})
             except Exception as e:
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.end_headers()
-                self.wfile.write(json.dumps({"sucesso": False, "erro": str(e)}).encode("utf-8"))
+                self._responder_json({"sucesso": False, "erro": str(e)})
             return
 
         self.send_response(404)
@@ -202,7 +328,7 @@ def iniciar_servidor():
     endereco = ("", PORT)
     servidor = HTTPServer(endereco, MusicHandler)
     print("=" * 65)
-    print(f"🎵 ESTÚDIO DE CRIAÇÃO MUSICAL INICIADO!")
+    print(f"🎵 ESTÚDIO DE CRIAÇÃO MUSICAL MULTI-MOTOR INICIADO!")
     print(f"👉 Abra no seu navegador: http://localhost:{PORT}")
     print("=" * 65)
     print("Pressione Ctrl+C para encerrar o servidor.")
@@ -214,4 +340,3 @@ def iniciar_servidor():
 
 if __name__ == "__main__":
     iniciar_servidor()
-

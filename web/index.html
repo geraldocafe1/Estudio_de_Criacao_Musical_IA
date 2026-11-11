@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estúdio de Criação Musical IA</title>
+  <title>Estúdio de Criação Musical IA - Multi-Motor</title>
   <style>
     :root {
       --bg: #0f111a;
@@ -19,140 +19,235 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 1.5rem; }
+    .container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 1.5rem; }
     header { text-align: center; margin-bottom: 0.5rem; }
     header h1 { font-size: 2.2rem; margin-bottom: 0.4rem; background: linear-gradient(135deg, #a78bfa, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     header p { color: var(--text-muted); font-size: 1rem; }
+
+    .grid-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1.5rem; align-items: start; }
+    @media (max-width: 900px) { .grid-layout { grid-template-columns: 1fr; } }
+
+    .col-stack { display: flex; flex-direction: column; gap: 1.5rem; }
+
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-    .card-title { font-size: 1.2rem; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #c4b5fd; }
-    .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.2rem; }
-    label { font-size: 0.9rem; font-weight: 500; color: #e5e7eb; }
-    input[type="text"], select, textarea {
+    .card-title { font-size: 1.15rem; margin-bottom: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; color: #c4b5fd; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+    label { font-size: 0.88rem; font-weight: 500; color: #e5e7eb; }
+
+    input[type="text"], input[type="password"], select, textarea {
       background: var(--input-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       color: var(--text);
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.92rem;
       outline: none;
       transition: border-color 0.2s;
+      width: 100%;
     }
-    input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--accent); }
-    textarea { min-height: 220px; font-family: 'Consolas', monospace; line-height: 1.5; resize: vertical; }
-    .genre-presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { min-height: 250px; font-family: 'Consolas', monospace; line-height: 1.5; resize: vertical; }
+
+    .token-wrapper { display: flex; gap: 0.5rem; }
+    .btn-eye {
+      background: #252a3d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0 0.9rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-eye:hover { background: #323952; }
+    .hint { font-size: 0.8rem; color: var(--text-muted); }
+
+    .genre-presets { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1rem; }
     .preset-btn {
       background: var(--input-bg);
       border: 1px solid var(--border);
       color: var(--text-muted);
       border-radius: 20px;
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.82rem;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .preset-btn:hover, .preset-btn.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .tag-helpers { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem; }
+    .preset-btn:hover, .preset-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .tag-helpers { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
     .tag-btn {
       background: #252a3d;
       border: 1px solid #3b4263;
       color: #a78bfa;
       border-radius: 6px;
-      padding: 0.25rem 0.6rem;
-      font-size: 0.8rem;
+      padding: 0.25rem 0.55rem;
+      font-size: 0.78rem;
       cursor: pointer;
       font-family: monospace;
       font-weight: 600;
     }
     .tag-btn:hover { background: #3b4263; color: #fff; }
+
     .btn-submit {
       background: linear-gradient(135deg, var(--accent), #9333ea);
       color: white;
       border: none;
       border-radius: 8px;
-      padding: 1rem 2rem;
-      font-size: 1.05rem;
+      padding: 0.95rem 1.5rem;
+      font-size: 1.02rem;
       font-weight: 600;
       cursor: pointer;
       width: 100%;
-      transition: opacity 0.2s, transform 0.1s;
+      transition: opacity 0.2s;
       box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
     }
     .btn-submit:hover { opacity: 0.95; }
-    .btn-submit:active { transform: scale(0.99); }
-    .status-box {
-      display: none;
-      border-radius: 8px;
-      padding: 1rem;
-      font-size: 0.95rem;
-      margin-top: 1rem;
-      line-height: 1.5;
-    }
+
+    .status-box { display: none; border-radius: 8px; padding: 1rem; font-size: 0.92rem; margin-top: 1rem; line-height: 1.5; }
     .status-box.info { background: rgba(59, 130, 246, 0.15); border: 1px solid #3b82f6; color: #93c5fd; }
     .status-box.success { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #a7f3d0; }
     .status-box.warning { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fde68a; }
+
+    /* Biblioteca & Exemplos */
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+    }
+    .tab-btn.active { background: rgba(124, 58, 237, 0.2); color: #c4b5fd; }
+
+    .lib-list { display: flex; flex-direction: column; gap: 0.9rem; max-height: 760px; overflow-y: auto; padding-right: 4px; }
+    .music-item {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .music-header { display: flex; gap: 0.75rem; align-items: center; }
+    .music-cover { width: 54px; height: 54px; border-radius: 8px; object-fit: cover; background: #252a3d; flex-shrink: 0; }
+    .music-meta h4 { font-size: 0.98rem; color: #f3f4f6; margin-bottom: 0.2rem; }
+    .music-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      background: #252a3d;
+      color: #a78bfa;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .prompt-preview {
+      background: #0b0d14;
+      border: 1px solid #23273b;
+      border-radius: 6px;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      font-family: monospace;
+      line-height: 1.4;
+    }
+    .prompt-preview strong { color: #c4b5fd; }
+    .btn-load {
+      background: #252a3d;
+      border: 1px solid #3b4263;
+      color: #e5e7eb;
+      border-radius: 6px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .btn-load:hover { background: var(--accent); border-color: var(--accent); color: white; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>🎵 Estúdio de Criação Musical IA</h1>
-      <p>Crie músicas completas com instrumentos, vocais e letras originais</p>
+      <p>Múltiplos Motores de IA • Biblioteca de Músicas & Prompts • Composição Completa</p>
     </header>
 
-    <div class="card">
-      <div class="card-title">1. Informações Básicas</div>
-      <div class="form-group">
-        <label for="titulo">Título da Música</label>
-        <input type="text" id="titulo" placeholder="Ex: Estrada Sem Fim" value="Nossa História">
-      </div>
-    </div>
+    <div class="grid-layout">
+      <!-- COLUNA ESQUERDA: COMPOSITOR -->
+      <div class="col-stack">
+        <!-- Card 0: Motor e Token -->
+        <div class="card">
+          <div class="card-title">🤖 1. Motor de IA & Token de Acesso</div>
+          <div class="form-group">
+            <label for="motor">Escolha a API / Motor de IA:</label>
+            <select id="motor" onchange="atualizarDicaMotor()">
+              <option value="aimusicapi">Suno AI (via AIMusicAPI.ai)</option>
+              <option value="fal_minimax">MiniMax Music v2.6 (via Fal.ai)</option>
+              <option value="fal_acestep">ACE-Step Open-Source (via Fal.ai)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.3rem;">
+            <label for="token">Token / API Key da IA escolhida:</label>
+            <div class="token-wrapper">
+              <input type="password" id="token" placeholder="Cole aqui sua API Key (ou deixe vazio para usar a chave do .env)">
+              <button type="button" class="btn-eye" onclick="alternarVisibilidadeToken()">👁️</button>
+            </div>
+            <span class="hint" id="motorHint">✅ Se deixar vazio no modo Suno (AIMusicAPI), o sistema usará a chave configurada no seu arquivo .env.</span>
+          </div>
+        </div>
 
-    <div class="card">
-      <div class="card-title">2. Gênero Musical & Instrumentação</div>
-      <label>Escolha rápida de estilo:</label>
-      <div class="genre-presets" id="presetContainer">
-        <button type="button" class="preset-btn active" data-tags="brazilian pop rock, electric guitar riffs, punchy drums, driving bass, passionate male vocals, 125 bpm">Pop Rock BR</button>
-        <button type="button" class="preset-btn" data-tags="bossa nova, smooth nylon acoustic guitar, soft percussion, warm upright bass, gentle female vocals, intimate vibe">Bossa Nova</button>
-        <button type="button" class="preset-btn" data-tags="brazilian sertanejo, acoustic steel guitar, accordion solo, modern pop drums, expressive male vocals, emotional">Sertanejo</button>
-        <button type="button" class="preset-btn" data-tags="synthwave, 1980s analog synthesizers, gated reverb snare, driving arpeggiator, nostalgic atmospheric vocals, 115 bpm">Synthwave 80s</button>
-        <button type="button" class="preset-btn" data-tags="indie folk pop, acoustic guitar fingerpicking, handclaps, warm vocal harmonies, uplifting chorus, 100 bpm">Indie Pop Acústico</button>
-        <button type="button" class="preset-btn" data-tags="melodic heavy metal, fast double bass drums, heavy distorted guitars, epic melodic guitar solo, powerful soaring vocals">Heavy Metal</button>
-        <button type="button" class="preset-btn" data-tags="melodic lo-fi hip hop, chill Rhodes piano, soft 808 sub bass, relaxed drum groove, smooth vocal flow, 85 bpm">Lo-Fi Trap</button>
-        <button type="button" class="preset-btn" data-tags="contemporary gospel worship, warm atmospheric piano, ambient reverb electric guitar, building drums, soaring emotive vocals, backing choir, uplifting, 74 bpm">Gospel Worship</button>
-        <button type="button" class="preset-btn" data-tags="brazilian pentecostal gospel, powerful passionate female vocals, full gospel choir harmonies, hammond organ, orchestral strings, grand snare drums, inspiring">Gospel Pentecostal</button>
-        <button type="button" class="preset-btn" data-tags="acoustic gospel praise, warm nylon guitar, soft piano chords, gentle cajon percussion, intimate heartfelt vocals, soulful harmonies, 80 bpm">Gospel Acústico</button>
-        <button type="button" class="preset-btn" data-tags="acoustic trap, brazilian love trap, starts with solo nylon acoustic guitar and soft emotional vocals, dynamic beat switch into heavy 808 sub bass, crisp trap hi-hats, melodic autotune rap, 132 bpm">Violão ➡️ Trap (Beat Switch)</button>
-      </div>
+        <!-- Card 1: Título e Estilo -->
+        <div class="card">
+          <div class="card-title">🎸 2. Título, Gênero & Instrumentação</div>
+          <div class="form-group">
+            <label for="titulo">Título da Música</label>
+            <input type="text" id="titulo" value="Nossa História">
+          </div>
 
-      <div class="form-group">
-        <label for="tags">Tags de Estilo, Instrumentos e Voz (em inglês para melhor precisão do modelo)</label>
-        <input type="text" id="tags" value="brazilian pop rock, electric guitar riffs, punchy drums, driving bass, passionate male vocals, 125 bpm">
-      </div>
-    </div>
+          <label>Escolha rápida de estilo:</label>
+          <div class="genre-presets" id="presetContainer">
+            <button type="button" class="preset-btn active" data-tags="brazilian pop rock, electric guitar riffs, punchy drums, driving bass, passionate male vocals, 125 bpm">Pop Rock BR</button>
+            <button type="button" class="preset-btn" data-tags="bossa nova, smooth nylon acoustic guitar, soft percussion, warm upright bass, gentle female vocals, intimate vibe">Bossa Nova</button>
+            <button type="button" class="preset-btn" data-tags="brazilian sertanejo, acoustic steel guitar, accordion solo, modern pop drums, expressive male vocals, emotional">Sertanejo</button>
+            <button type="button" class="preset-btn" data-tags="synthwave, 1980s analog synthesizers, gated reverb snare, driving arpeggiator, nostalgic atmospheric vocals, 115 bpm">Synthwave 80s</button>
+            <button type="button" class="preset-btn" data-tags="indie folk pop, acoustic guitar fingerpicking, handclaps, warm vocal harmonies, uplifting chorus, 100 bpm">Indie Pop Acústico</button>
+            <button type="button" class="preset-btn" data-tags="melodic heavy metal, fast double bass drums, heavy distorted guitars, epic melodic guitar solo, powerful soaring vocals">Heavy Metal</button>
+            <button type="button" class="preset-btn" data-tags="melodic lo-fi hip hop, chill Rhodes piano, soft 808 sub bass, relaxed drum groove, smooth vocal flow, 85 bpm">Lo-Fi Trap</button>
+            <button type="button" class="preset-btn" data-tags="contemporary gospel worship, warm atmospheric piano, ambient reverb electric guitar, building drums, soaring emotive vocals, backing choir, uplifting, 74 bpm">Gospel Worship</button>
+            <button type="button" class="preset-btn" data-tags="brazilian pentecostal gospel, powerful passionate female vocals, full gospel choir harmonies, hammond organ, orchestral strings, grand snare drums, inspiring">Gospel Pentecostal</button>
+            <button type="button" class="preset-btn" data-tags="acoustic gospel praise, warm nylon guitar, soft piano chords, gentle cajon percussion, intimate heartfelt vocals, soulful harmonies, 80 bpm">Gospel Acústico</button>
+            <button type="button" class="preset-btn" data-tags="acoustic trap, brazilian love trap, starts with solo nylon acoustic guitar and soft emotional vocals, dynamic beat switch into heavy 808 sub bass, crisp trap hi-hats, melodic autotune rap, 132 bpm">Violão ➡️ Trap (Beat Switch)</button>
+          </div>
 
-    <div class="card">
-      <div class="card-title">3. Letra e Arranjo da Música</div>
-      <label>Clique nas tags para inserir blocos de arranjo na letra:</label>
-      <div class="tag-helpers">
-        <button type="button" class="tag-btn" onclick="inserirTag('[Verse 1]\n')">+ [Verse 1]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Pre-Chorus]\n')">+ [Pre-Chorus]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Chorus]\n')">+ [Chorus]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Verse 2]\n')">+ [Verse 2]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Bridge]\n')">+ [Bridge]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Choir]\n')">+ [Choir]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Guitar Solo]\n')">+ [Guitar Solo]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Drop]\n')">+ [Drop]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('[Intro - Solo Acoustic Guitar, Soft Vocals, No Drums]\n')">+ [Intro Violão]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Beat Switch - Heavy 808 Bass, Trap Hi-Hats, Hard Beat]\n')">+ [Virada Trap]</button>
-        <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Outro]\n')">+ [Outro]</button>
-      </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="tags">Prompt de Estilo / Instrumentos (em inglês para maior precisão)</label>
+            <input type="text" id="tags" value="brazilian pop rock, electric guitar riffs, punchy drums, driving bass, passionate male vocals, 125 bpm">
+          </div>
+        </div>
 
-      <div class="form-group">
-        <textarea id="letra">[Verse 1]
+        <!-- Card 2: Letra -->
+        <div class="card">
+          <div class="card-title">📝 3. Letra & Blocos de Arranjo</div>
+          <div class="tag-helpers">
+            <button type="button" class="tag-btn" onclick="inserirTag('[Verse 1]\n')">+ [Verse 1]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Pre-Chorus]\n')">+ [Pre-Chorus]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Chorus]\n')">+ [Chorus]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Verse 2]\n')">+ [Verse 2]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Bridge]\n')">+ [Bridge]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Choir]\n')">+ [Choir]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Guitar Solo]\n')">+ [Guitar Solo]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('[Intro - Solo Acoustic Guitar, Soft Vocals, No Drums]\n')">+ [Intro Violão]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Beat Switch - Heavy 808 Bass, Trap Hi-Hats, Hard Beat]\n')">+ [Virada Trap]</button>
+            <button type="button" class="tag-btn" onclick="inserirTag('\n\n[Outro]\n')">+ [Outro]</button>
+          </div>
+
+          <div class="form-group">
+            <textarea id="letra">[Verse 1]
 Foram dias conversando através de um visor
 A distância era grande, mas não parou esse amor
 Até que o grande dia finalmente chegou
@@ -200,15 +295,128 @@ Nossa história, meu bem, não vai terminar assim
 Eu não consegui dizer...
 Mas eu te amo.
 [Fade out]</textarea>
+          </div>
+
+          <button type="button" class="btn-submit" id="btnGerar" onclick="dispararGeracao()">✨ Gerar Música Completa</button>
+          <div id="statusBox" class="status-box"></div>
+        </div>
       </div>
 
-      <button type="button" class="btn-submit" id="btnGerar" onclick="dispararGeracao()">✨ Gerar Música Completa</button>
-      <div id="statusBox" class="status-box"></div>
+      <!-- COLUNA DIREITA: BIBLIOTECA & EXEMPLOS -->
+      <div class="card" style="position: sticky; top: 1rem;">
+        <div class="card-title">🎧 Biblioteca & Prompts de Exemplo</div>
+        <div class="tabs">
+          <button type="button" class="tab-btn active" id="tabGeradas" onclick="mudarAba('geradas')">Músicas Feitas</button>
+          <button type="button" class="tab-btn" id="tabExemplos" onclick="mudarAba('exemplos')">Modelos Prontos</button>
+        </div>
+
+        <div id="listaGeradas" class="lib-list">
+          <p class="hint">Carregando músicas geradas...</p>
+        </div>
+
+        <div id="listaExemplos" class="lib-list" style="display: none;">
+          <p class="hint">Carregando modelos...</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Presets de Gênero
+    let bibliotecaCache = { musicas_geradas: [], exemplos: [] };
+
+    function alternarVisibilidadeToken() {
+      const input = document.getElementById('token');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function atualizarDicaMotor() {
+      const motor = document.getElementById('motor').value;
+      const hint = document.getElementById('motorHint');
+      if (motor === 'aimusicapi') {
+        hint.innerText = '✅ Se deixar vazio no modo Suno (AIMusicAPI), o sistema usará a chave configurada no seu arquivo .env.';
+      } else {
+        hint.innerText = '🔑 Cole sua API Key da Fal.ai (fal.ai/dashboard/keys) acima para rodar este motor.';
+      }
+    }
+
+    function mudarAba(aba) {
+      document.getElementById('tabGeradas').classList.toggle('active', aba === 'geradas');
+      document.getElementById('tabExemplos').classList.toggle('active', aba === 'exemplos');
+      document.getElementById('listaGeradas').style.display = aba === 'geradas' ? 'flex' : 'none';
+      document.getElementById('listaExemplos').style.display = aba === 'exemplos' ? 'flex' : 'none';
+    }
+
+    async function carregarBiblioteca() {
+      try {
+        const resp = await fetch('/api/biblioteca');
+        bibliotecaCache = await resp.json();
+        renderizarBiblioteca();
+      } catch (e) {
+        console.error('Erro ao carregar biblioteca:', e);
+      }
+    }
+
+    function carregarNoEditor(titulo, tags, letra) {
+      document.getElementById('titulo').value = titulo;
+      document.getElementById('tags').value = tags;
+      if (letra) document.getElementById('letra').value = letra;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderizarBiblioteca() {
+      const elGeradas = document.getElementById('listaGeradas');
+      const elExemplos = document.getElementById('listaExemplos');
+
+      // Músicas geradas em outputs/
+      if (bibliotecaCache.musicas_geradas.length === 0) {
+        elGeradas.innerHTML = '<p class="hint">Nenhuma música salva em outputs/ ainda.</p>';
+      } else {
+        elGeradas.innerHTML = '';
+        bibliotecaCache.musicas_geradas.forEach((m, idx) => {
+          const div = document.createElement('div');
+          div.className = 'music-item';
+          const durStr = m.duracao ? ` • ${Math.round(Number(m.duracao))}s` : '';
+          div.innerHTML = `
+            <div class="music-header">
+              ${m.capa ? `<img src="${m.capa}" class="music-cover" alt="Capa">` : `<div class="music-cover" style="display:flex;align-items:center;justify-content:center;">🎵</div>`}
+              <div class="music-meta">
+                <h4>${m.titulo} (V${idx + 1})</h4>
+                <span class="music-badge">${m.motor}${durStr}</span>
+              </div>
+            </div>
+            <audio controls style="width: 100%; height: 34px;">
+              <source src="${m.arquivo}" type="audio/mpeg">
+            </audio>
+            <div class="prompt-preview">
+              <strong>Prompt utilizado:</strong><br>${m.tags}
+            </div>
+            <button type="button" class="btn-load" id="btnLoadGerada${idx}">📋 Carregar Prompt e Letra no Editor</button>
+          `;
+          elGeradas.appendChild(div);
+          document.getElementById(`btnLoadGerada${idx}`).onclick = () => carregarNoEditor(m.titulo, m.tags, m.letra);
+        });
+      }
+
+      // Exemplos prontos (compositor.py)
+      elExemplos.innerHTML = '';
+      bibliotecaCache.exemplos.forEach((ex, idx) => {
+        const div = document.createElement('div');
+        div.className = 'music-item';
+        div.innerHTML = `
+          <div class="music-meta">
+            <h4>${ex.titulo}</h4>
+            <span class="music-badge">${ex.id}</span>
+          </div>
+          <div class="prompt-preview">
+            <strong>Prompt de Estilo:</strong><br>${ex.tags}
+          </div>
+          <button type="button" class="btn-load" id="btnLoadEx${idx}">✨ Usar este Exemplo no Editor</button>
+        `;
+        elExemplos.appendChild(div);
+        document.getElementById(`btnLoadEx${idx}`).onclick = () => carregarNoEditor(ex.titulo, ex.tags, ex.letra);
+      });
+    }
+
     document.querySelectorAll('.preset-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
@@ -230,112 +438,109 @@ Mas eu te amo.
       const titulo = document.getElementById('titulo').value.trim();
       const tags = document.getElementById('tags').value.trim();
       const letra = document.getElementById('letra').value.trim();
+      const motor = document.getElementById('motor').value;
+      const token = document.getElementById('token').value.trim();
       const btn = document.getElementById('btnGerar');
       const box = document.getElementById('statusBox');
 
       btn.disabled = true;
-      btn.innerText = "⏳ Processando...";
+      btn.innerText = "⏳ Enviando para a IA...";
       box.style.display = "block";
       box.className = "status-box info";
-      box.innerText = "Enviando composição para processamento...";
+      box.innerText = "Conectando ao motor selecionado...";
 
       try {
         const resp = await fetch('/api/gerar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ titulo, tags, letra })
+          body: JSON.stringify({ titulo, tags, letra, motor, token })
         });
         const data = await resp.json();
 
         if (data.modo === "rascunho") {
           box.className = "status-box warning";
-          box.innerHTML = `<strong>⚠️ Modo Rascunho:</strong> ${data.mensagem}<br>Arquivo salvo: <code>outputs/${data.arquivo_salvo}</code>`;
+          box.innerHTML = `<strong>⚠️ Modo Rascunho:</strong> ${data.mensagem}<br>Arquivo: <code>outputs/${data.arquivo_salvo}</code>`;
         } else if (data.sucesso) {
           box.className = "status-box info";
-          
-          // Extrai o ID da tarefa retornado pela API
-          let taskId = null;
-          const res = data.resultado;
-          if (res) {
-            taskId = res.taskId || res.task_id || res.id || (res.data && (res.data.taskId || res.data.task_id || res.data.id));
-          }
+          const res = data.resultado || {};
+          const taskId = res.request_id || res.taskId || res.task_id || res.id || (res.data && (res.data.taskId || res.data.task_id || res.data.id));
+          const statusUrl = res.status_url || "";
+          const responseUrl = res.response_url || "";
 
-          box.innerHTML = `<strong>🎉 Sucesso!</strong> A música foi enviada para o estúdio da IA.<br>` +
-                          `ID da Tarefa: <code>${taskId || JSON.stringify(res)}</code><br><br>` +
-                          `<div id="pollingStatus">⏳ Sintetizando arranjos e vocais... Isso leva cerca de 1 minuto. Aguarde...</div>`;
+          box.innerHTML = `<strong>🎉 Enviado para geração!</strong><br>` +
+                          `Motor: <code>${motor}</code> | ID: <code>${taskId || JSON.stringify(res)}</code><br><br>` +
+                          `<div id="pollingStatus">⏳ Sintetizando música... Aguarde cerca de 1 minuto.</div>`;
 
           if (taskId) {
-            iniciarMonitoramento(taskId);
+            iniciarMonitoramento(taskId, motor, token, statusUrl, responseUrl, titulo);
           }
         } else {
           box.className = "status-box warning";
-          box.innerText = data.erro || "Ocorreu um problema ao gerar.";
+          box.innerText = data.erro || "Ocorreu um erro ao gerar.";
         }
       } catch (e) {
         box.className = "status-box warning";
-        box.innerText = "Erro ao conectar com o servidor: " + e.message;
+        box.innerText = "Erro de conexão: " + e.message;
       } finally {
         btn.disabled = false;
         btn.innerText = "✨ Gerar Música Completa";
       }
     }
 
-    async function iniciarMonitoramento(taskId) {
+    async function iniciarMonitoramento(taskId, motor, token, statusUrl, responseUrl, titulo) {
       const pStatus = document.getElementById('pollingStatus');
       const box = document.getElementById('statusBox');
       let tentativas = 0;
-      const maxTentativas = 30;
+      const maxTentativas = 36;
 
       const intervalo = setInterval(async () => {
         tentativas++;
-        pStatus.innerText = `⏳ Gerando áudio... Tentativa ${tentativas}/${maxTentativas} (aguarde alguns segundos)`;
+        pStatus.innerText = `⏳ Sintetizando áudio... Verificação ${tentativas}/${maxTentativas}`;
 
         try {
-          const resp = await fetch(`/api/status-task?taskId=${encodeURIComponent(taskId)}`);
+          const params = new URLSearchParams({
+            taskId, motor, token, statusUrl, responseUrl
+          });
+          const resp = await fetch(`/api/status-task?${params.toString()}`);
           const data = await resp.json();
 
-          let audioUrl = null;
+          let audioUrl = data.audio_url || null;
           let sunoData = null;
 
-          if (data && data.data && data.data.response && data.data.response.sunoData) {
-            sunoData = data.data.response.sunoData;
-          } else if (data && data.response && data.response.sunoData) {
-            sunoData = data.response.sunoData;
-          } else if (Array.isArray(data) && data.length > 0) {
-            sunoData = data;
-          }
+          if (!audioUrl) {
+            if (data && data.data && Array.isArray(data.data)) sunoData = data.data;
+            else if (data && data.data && data.data.response && data.data.response.sunoData) sunoData = data.data.response.sunoData;
+            else if (data && data.response && data.response.sunoData) sunoData = data.response.sunoData;
 
-          if (sunoData && sunoData.length > 0) {
-            audioUrl = sunoData[0].audio_url || sunoData[0].stream_audio_url;
+            if (sunoData && sunoData.length > 0) {
+              audioUrl = sunoData[0].audio_url || sunoData[0].stream_audio_url;
+            }
           }
 
           if (audioUrl) {
             clearInterval(intervalo);
             box.className = "status-box success";
             box.innerHTML = `
-              <h3>🎵 Sua música "Nossa História" está pronta!</h3>
-              <p style="margin: 0.8rem 0;">Aperte o play para ouvir a versão gerada pela IA:</p>
-              <audio controls autoplay style="width: 100%; margin: 0.5rem 0;">
+              <h3>🎵 "${titulo}" está pronta!</h3>
+              <audio controls autoplay style="width: 100%; margin: 0.7rem 0;">
                 <source src="${audioUrl}" type="audio/mpeg">
-                Seu navegador não suporta áudio.
               </audio>
-              <div style="margin-top: 1rem;">
-                <a href="${audioUrl}" target="_blank" download="Nossa_Historia.mp3" style="display: inline-block; background: #10b981; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600;">⬇️ Baixar Arquivo MP3</a>
-              </div>
+              <a href="${audioUrl}" target="_blank" download="${titulo.replace(/\s+/g, '_')}.mp3" style="display: inline-block; background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">⬇️ Baixar MP3</a>
             `;
             return;
           }
 
           if (tentativas >= maxTentativas) {
             clearInterval(intervalo);
-            pStatus.innerHTML = `O processamento ainda está em andamento. Você também pode conferir e ouvir a faixa diretamente no painel do <a href="https://aimusicapi.ai/dashboard" target="_blank" style="color: #a78bfa;">AIMusicAPI Dashboard</a>.`;
+            pStatus.innerHTML = `O processamento está demorando mais que o normal. Verifique o histórico no painel da sua API.`;
           }
         } catch (err) {
-          console.error("Erro ao verificar status:", err);
+          console.error("Erro no polling:", err);
         }
-      }, 10000); // Checa a cada 10 segundos
+      }, 10000);
     }
+
+    carregarBiblioteca();
   </script>
 </body>
 </html>
-
