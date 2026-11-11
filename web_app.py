@@ -192,6 +192,56 @@ class MusicHandler(SimpleHTTPRequestHandler):
             self._responder_json({"status": "processing"})
             return
 
+        elif self.path.startswith("/api/download"):
+            query = parse_qs(urlparse(self.path).query)
+            url_audio = query.get("url", [""])[0].strip()
+            nome = query.get("nome", ["musica.mp3"])[0].strip()
+
+            if not url_audio:
+                self.send_response(400)
+                self.end_headers()
+                return
+
+            # Se for link de stream do aimusicapi, converte para o MP3 definitivo em stems/
+            if "api.aimusicapi.ai/api/v1/stream/" in url_audio:
+                clip_id = url_audio.rstrip("/").split("/")[-1]
+                url_audio = f"https://files.aimusicapi.ai/stems/{clip_id}.mp3"
+
+            # Se já for um arquivo local em /outputs/
+            if url_audio.startswith("/outputs/"):
+                arq_local = OUTPUT_DIR / Path(url_audio).name
+                if arq_local.exists():
+                    with open(arq_local, "rb") as f:
+                        conteudo = f.read()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "audio/mpeg")
+                    self.send_header("Content-Disposition", f'attachment; filename="{nome}"')
+                    self.send_header("Content-Length", str(len(conteudo)))
+                    self.end_headers()
+                    self.wfile.write(conteudo)
+                    return
+
+            # Baixa da nuvem via proxy do backend e salva em outputs/
+            try:
+                ssl_ctx = criar_contexto_ssl()
+                req = urllib.request.Request(url_audio, headers={"User-Agent": "Mozilla/5.0"})
+                with urllib.request.urlopen(req, timeout=60, context=ssl_ctx) as resp:
+                    conteudo = resp.read()
+                with open(OUTPUT_DIR / nome, "wb") as f_out:
+                    f_out.write(conteudo)
+
+                self.send_response(200)
+                self.send_header("Content-Type", "audio/mpeg")
+                self.send_header("Content-Disposition", f'attachment; filename="{nome}"')
+                self.send_header("Content-Length", str(len(conteudo)))
+                self.end_headers()
+                self.wfile.write(conteudo)
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(str(e).encode("utf-8"))
+            return
+
         return super().do_GET()
 
     def do_POST(self):

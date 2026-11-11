@@ -533,14 +533,17 @@ Mas eu te amo.
 
           if (audioUrl) {
             clearInterval(intervalo);
+            const nomeArquivo = `${titulo.replace(/\s+/g, '_')}.mp3`;
+            const urlDownload = `/api/download?url=${encodeURIComponent(audioUrl)}&nome=${encodeURIComponent(nomeArquivo)}`;
             box.className = "status-box success";
             box.innerHTML = `
               <h3>🎵 "${titulo}" está pronta!</h3>
               <audio controls autoplay style="width: 100%; margin: 0.7rem 0;">
                 <source src="${audioUrl}" type="audio/mpeg">
               </audio>
-              <a href="${audioUrl}" target="_blank" download="${titulo.replace(/\s+/g, '_')}.mp3" style="display: inline-block; background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">⬇️ Baixar MP3</a>
+              <a href="${urlDownload}" download="${nomeArquivo}" style="display: inline-block; background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; font-weight: 600;">⬇️ Baixar MP3</a>
             `;
+            carregarBiblioteca();
             return;
           }
 
