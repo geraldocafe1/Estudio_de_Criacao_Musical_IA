@@ -45,6 +45,22 @@ GENEROS_SUGERIDOS = {
         "nome": "Hip-Hop / Lo-Fi Melódico",
         "tags": "melodic lo-fi hip hop, chill Rhodes piano, soft 808 sub bass, relaxed drum groove, smooth vocal flow, 85 bpm",
     },
+    "8": {
+        "nome": "Gospel Worship / Adoração Contemporânea",
+        "tags": "contemporary gospel worship, warm atmospheric piano, ambient reverb electric guitar, building drums, soaring emotive vocals, backing choir, uplifting, 74 bpm",
+    },
+    "9": {
+        "nome": "Gospel Pentecostal / Coral Poderoso",
+        "tags": "brazilian pentecostal gospel, powerful passionate female vocals, full gospel choir harmonies, hammond organ, orchestral strings, grand snare drums, inspiring",
+    },
+    "10": {
+        "nome": "Gospel Acústico / Voz e Violão",
+        "tags": "acoustic gospel praise, warm nylon guitar, soft piano chords, gentle cajon percussion, intimate heartfelt vocals, soulful harmonies, 80 bpm",
+    },
+    "11": {
+        "nome": "Violão para Trap (Beat Switch / Estilo Cinek)",
+        "tags": "acoustic trap, brazilian love trap, starts with solo nylon acoustic guitar and soft emotional vocals, dynamic beat switch into heavy 808 sub bass, crisp trap hi-hats, melodic autotune rap, 132 bpm",
+    },
 }
 
 LETRA_EXEMPLO = """[Verse 1]
@@ -116,9 +132,9 @@ def solicitar_dados_musica():
     print("\n[2] Escolha o GÊNERO MUSICAL:")
     for chave, item in GENEROS_SUGERIDOS.items():
         print(f"    [{chave}] {item['nome']}")
-    print("    [8] Personalizado (digitar estilo e instrumentos)")
+    print("    [12] Personalizado (digitar estilo e instrumentos)")
 
-    opcao_genero = input("\nEscolha uma opção (1-8) [padrão: 1]: ").strip() or "1"
+    opcao_genero = input("\nEscolha uma opção (1-12) [padrão: 1]: ").strip() or "1"
 
     if opcao_genero in GENEROS_SUGERIDOS:
         genero_escolhido = GENEROS_SUGERIDOS[opcao_genero]["tags"]

@@ -142,6 +142,85 @@ Lost in time beneath the laser light!
 Riding the grid...
 Lost in the neon...
 (Synth arpeggio fade out)"""
+    },
+    "gospel_worship": {
+        "titulo": "Tua Graça Me Basta",
+        "tags": "contemporary gospel worship, warm atmospheric piano, ambient reverb electric guitar, building drums, soaring emotive vocals, backing choir, uplifting, 74 bpm",
+        "letra": """[Verse 1]
+Quando as forças parecem se esgotar
+E o caminho fica difícil de enxergar
+Eu fecho os olhos e ouço a Tua voz
+Dizendo que nunca estive só
+
+[Pre-Chorus]
+Mesmo em meio à tempestade
+Tua paz inunda o meu coração
+
+[Chorus]
+Tua graça me basta, Senhor
+É o abrigo onde encontro amor
+Os céus declaram a Tua glória sem fim
+E o Teu Espírito vive em mim!
+
+[Choir]
+Santo, Santo é o Senhor!
+Digno de toda honra e louvor!
+
+[Bridge]
+Não importa o tamanho da luta
+Eu confio em quem me sustenta
+Minha vida está em Tuas mãos
+Para sempre Te adorarei
+
+[Chorus]
+Tua graça me basta, Senhor
+É o abrigo onde encontro amor
+Os céus declaram a Tua glória sem fim
+E o Teu Espírito vive em mim!
+
+[Outro]
+Tua graça me basta...
+Para sempre, Senhor.
+[Fade out]"""
+    },
+    "acoustic_trap": {
+        "titulo": "Madrugada e 808",
+        "tags": "acoustic trap, brazilian love trap, starts with solo nylon acoustic guitar and soft emotional vocals, dynamic beat switch into heavy 808 sub bass, crisp trap hi-hats, melodic autotune rap, 132 bpm",
+        "letra": """[Intro - Solo Acoustic Guitar Only, No Drums]
+[Verse 1 - Soft Intimate Vocals, Nylon Guitar Fingerpicking]
+Madrugada fria, eu e o violão na mão
+Tentando colocar em versos o que sente o coração
+Você foi embora, deixou o quarto em silêncio
+Cada acorde que eu toco vira um novo pensamento
+
+[Pre-Chorus - Rising Tension, Guitar Echoes]
+Eu tentei fingir que já tinha superado
+Mas o beat da minha mente nunca fica parado...
+(Pausa... prepara a virada!)
+
+[Beat Switch - Heavy 808 Bass, Crisp Trap Hi-Hats, Hard Trap Beat]
+[Chorus - Melodic Autotune Rap Flow, Layered Vocals]
+Agora o grave bate forte no peito! (Yeah!)
+Desse jeito eu sigo firme no meu corre perfeito
+Do violão suave pro grave que faz tremer o chão
+Transformei toda a saudade na batida da canção!
+
+[Verse 2 - Fast Trap Cadence, Heavy 808s and Guitar Sample]
+Não olho mais pra trás, o jogo virou
+Aquele tempo difícil só me fortaleceu e ensinou
+O som do meu violão agora toca no 808
+Quem duvidou da caminhada hoje entendeu o que eu falei!
+
+[Chorus - Melodic Autotune Rap Flow, Layered Vocals]
+Agora o grave bate forte no peito! (Yeah!)
+Desse jeito eu sigo firme no meu corre perfeito
+Do violão suave pro grave que faz tremer o chão
+Transformei toda a saudade na batida da canção!
+
+[Outro - Beat Fades Out, Solo Nylon Acoustic Guitar]
+No final, só fica a melodia...
+Eu, a madrugada e o violão.
+[Fade out]"""
     }
 }
 

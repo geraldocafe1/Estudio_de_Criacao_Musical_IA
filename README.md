@@ -101,8 +101,8 @@ Abra no seu navegador: **`http://localhost:8080`**
 ## 🎛️ Formas de Utilização
 
 ### 1. Interface Web (`web_app.py`)
-* Escolha de presets com um clique: Pop Rock, Bossa Nova, Sertanejo, Synthwave 80s, Heavy Metal, Lo-Fi.
-* Inserção de blocos de arranjo com um clique (`[Verse]`, `[Chorus]`, `[Solo]`, `[Outro]`).
+* Escolha de presets com um clique: Pop Rock, Bossa Nova, Sertanejo, Synthwave 80s, Heavy Metal, Lo-Fi, **Gospel (Worship, Pentecostal, Acústico)** e **Violão ➡️ Trap (Beat Switch)**.
+* Inserção de blocos de arranjo e meta-tags direcionais com um clique (`[Verse]`, `[Chorus]`, `[Choir]`, `[Intro Violão]`, `[Virada Trap]`, `[Outro]`).
 * Player de áudio integrado na página.
 
 ### 2. Terminal Interativo (`gerador.py`)
