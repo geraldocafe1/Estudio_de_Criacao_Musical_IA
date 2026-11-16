@@ -61,6 +61,10 @@ GENEROS_SUGERIDOS = {
         "nome": "Violão para Trap (Beat Switch / Estilo Cinek)",
         "tags": "acoustic trap, brazilian love trap, starts with solo nylon acoustic guitar and soft emotional vocals, dynamic beat switch into heavy 808 sub bass, crisp trap hi-hats, melodic autotune rap, 132 bpm",
     },
+    "12": {
+        "nome": "Pagode Romântico (Estilo Dilsinho & Ferrugem)",
+        "tags": "brazilian pagode romantico, emotional passionate male vocals, dilsinho and ferrugem style, bright cavaquinho strumming, tantan and pandeiro groove, smooth electric piano, warm bassline, soulful backing vocals, romantic pagode ballad, 88 bpm",
+    },
 }
 
 LETRA_EXEMPLO = """[Verse 1]
@@ -132,9 +136,9 @@ def solicitar_dados_musica():
     print("\n[2] Escolha o GÊNERO MUSICAL:")
     for chave, item in GENEROS_SUGERIDOS.items():
         print(f"    [{chave}] {item['nome']}")
-    print("    [12] Personalizado (digitar estilo e instrumentos)")
+    print("    [13] Personalizado (digitar estilo e instrumentos)")
 
-    opcao_genero = input("\nEscolha uma opção (1-12) [padrão: 1]: ").strip() or "1"
+    opcao_genero = input("\nEscolha uma opção (1-13) [padrão: 1]: ").strip() or "1"
 
     if opcao_genero in GENEROS_SUGERIDOS:
         genero_escolhido = GENEROS_SUGERIDOS[opcao_genero]["tags"]

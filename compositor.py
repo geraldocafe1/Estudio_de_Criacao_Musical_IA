@@ -221,6 +221,62 @@ Transformei toda a saudade na batida da canção!
 No final, só fica a melodia...
 Eu, a madrugada e o violão.
 [Fade out]"""
+    },
+    "pagode_romantico": {
+        "titulo": "Recaída Certa",
+        "tags": "brazilian pagode romantico, emotional passionate male vocals, dilsinho and ferrugem style, bright cavaquinho strumming, tantan and pandeiro groove, smooth electric piano, warm bassline, soulful backing vocals, romantic pagode ballad, 88 bpm",
+        "letra": """[Verse 1]
+Eu prometi pra mim mesmo não te procurar
+Apaguei as fotos pra tentar me enganar
+Mas quando bate a noite e a saudade aperta
+Qualquer mensagem sua é recaída certa
+
+[Verse 2]
+Ouvindo o nosso som, coração desacelera
+Olho pro relógio e a cabeça me condena
+Dizendo que é loucura voltar pro mesmo erro
+Mas quando eu lembro do teu beijo, eu me desespero
+
+[Pre-Chorus]
+O cavaquinho chora e já me dá razão
+Não adianta lutar contra essa paixão...
+
+[Chorus]
+Basta um "oi sumido" pra eu perder o juízo
+Largo tudo correndo só pra ver teu sorriso
+Você faz o que quer desse meu coração
+Num pagode colado, perde a explicação!
+(Diz pra mim se não é amor!)
+
+[Cavaquinho Solo]
+
+[Verse 3]
+Os amigos me dizem pra tomar cuidado
+Que eu vou me machucar de novo com o passado
+Mas ninguém manda no peito quando tá carente
+Tem fogo que não apaga entre a gente
+
+[Chorus]
+Basta um "oi sumido" pra eu perder o juízo
+Largo tudo correndo só pra ver teu sorriso
+Você faz o que quer desse meu coração
+Num pagode colado, perde a explicação!
+
+[Bridge]
+Se for pra errar de novo, que seja contigo
+Não quero mais fugir do meu próprio perigo
+
+[Chorus]
+Basta um "oi sumido" pra eu perder o juízo
+Largo tudo correndo só pra ver teu sorriso
+Você faz o que quer desse meu coração
+Num pagode colado, perde a explicação!
+
+[Outro]
+Num pagode colado...
+É recaída certa, meu bem.
+(Cavaquinho suave em fade out)
+[Fade out]"""
     }
 }
 
